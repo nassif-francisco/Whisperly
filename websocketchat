@@ -1,0 +1,33 @@
+1) correrlo a traves de python
+instalando todos los paquetes en un ambiente virtual y despues python3 application.py
+
+f __name__ == '__main__':
+    socketio.run(app), esto debe estar al final del application.py
+    
+
+2) correrlo a traves de docker, pero como un comando
+sudo docker-compose run --service-ports web /bin/bash
+
+(recuerda que debes usar la opcion de service-ports porque con el docker run no se mapean los puertos)
+
+>> python3 application.py
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0',debug=True,port=5000)
+    
+
+
+3) intentar correrlo a traves de gunicorn
+sudo docker-compose up web
+
+ENTRYPOINT ["/bin/bash", "-c", "gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5000 application:app"]
+
+https://stackoverflow.com/questions/64218171/getting-a-socket-hang-up-error-when-trying-to-access-my-flask-app-in-a-docker-co
+
+https://stackoverflow.com/questions/30554702/cant-connect-to-flask-web-service-connection-refused
+
+
+https://stackoverflow.com/questions/54101508/how-do-you-dockerize-a-websocket-server
+https://stackoverflow.com/questions/17157721/how-to-get-a-docker-containers-ip-address-from-the-host
+
+https://stackoverflow.com/questions/67832058/how-to-execute-bash-expression-in-docker-entrypoint

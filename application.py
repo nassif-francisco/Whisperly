@@ -6,7 +6,10 @@ import json
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-socketio = SocketIO(app)
+socketio = SocketIO(app,logger=True)
+
+print("creating websocket")
+print("creating websocket")
 
 # Channel Data Global Variables
 channel_list = {"general": [] }
@@ -14,8 +17,10 @@ present_channel = {"initial":"general"}
 
 @app.route("/", methods=["POST", "GET"])
 def index():
+    print("geti")
     if request.method == "GET":
         # Pass channel list to, and use jinja to display already created channels
+        print("get")
         return render_template("index.html", channel_list=channel_list)
 
     elif request.method == "POST":
@@ -75,3 +80,22 @@ def on_join(room_to_join):
     print("joining room")
     join_room(room_to_join)
     emit("join channel ack", room=room_to_join)
+
+@socketio.on_error()        # Handles the default namespace
+def error_handler(e):
+    print(e)
+
+def log_request(self):
+    print("djeijdie")
+    log = self.server.log
+    if log:
+        if hasattr(log, "info"):
+            log.info(self.format_request() + '\n')
+        else:
+            log.write(self.format_request() + '\n')
+
+import gevent
+gevent.pywsgi.WSGIHandler.log_request = log_request
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0',debug=True,port=5000)
